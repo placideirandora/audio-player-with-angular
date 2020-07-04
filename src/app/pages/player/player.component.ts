@@ -40,8 +40,13 @@ export class PlayerComponent implements OnInit {
   }
 
   playStream(url) {
-    this.audioService.playStream(url).subscribe((events) => {
+    this.audioService.playStream(url).subscribe(({ timeStamp, type }) => {
       // listening for fun here
+      console.log('Event from State: ', { type, timeStamp });
+
+      if (type === 'ended') {
+        this.next();
+      }
     });
   }
 
