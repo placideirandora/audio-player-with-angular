@@ -146,6 +146,14 @@ export class AudioService {
     this.audioObj.muted = false;
   }
 
+  replay() {
+    this.audioObj.loop = true;
+  }
+
+  unReplay() {
+    this.audioObj.loop = false;
+  }
+
   seekTo(seconds) {
     this.audioObj.currentTime = seconds;
   }

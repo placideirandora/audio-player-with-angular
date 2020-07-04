@@ -43,11 +43,6 @@ export class PlayerComponent implements OnInit {
 
   playStream(url) {
     this.audioService.playStream(url).subscribe(({ type }) => {
-      if (type === 'ended' && this.repeatCurrentSong === true) {
-        const { index, file } = this.currentFile;
-        this.openFile(file, index);
-      }
-
       if (
         type === 'ended' &&
         this.repeatCurrentSong === false &&
@@ -94,6 +89,12 @@ export class PlayerComponent implements OnInit {
 
   repeatSong() {
     this.repeatCurrentSong = !this.repeatCurrentSong;
+
+    if (this.repeatCurrentSong) {
+      this.audioService.replay();
+    } else {
+      this.audioService.unReplay();
+    }
   }
 
   onToggleMute() {
