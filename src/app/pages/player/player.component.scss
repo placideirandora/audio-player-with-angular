@@ -39,9 +39,18 @@
       padding: 2.5rem;
       justify-content: center;
       .mat-icon {
-        height: 48px !important;
-        width: 48px !important;
-        font-size: 48px !important;
+        height: 44px !important;
+        width: 44px !important;
+        font-size: 44px !important;
+      }
+
+      .repeat-song {
+        color: orange;
+        font-size: 40px !important;
+      }
+
+      .loop-icon {
+        font-size: 40px !important;
       }
     }
   }

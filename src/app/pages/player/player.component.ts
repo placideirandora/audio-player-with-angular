@@ -13,6 +13,7 @@ export class PlayerComponent implements OnInit {
   files: Array<any> = [];
   state: StreamState;
   currentFile: any = {};
+  repeatCurrentSong = false;
 
   constructor(
     private audioService: AudioService,
@@ -40,11 +41,13 @@ export class PlayerComponent implements OnInit {
   }
 
   playStream(url) {
-    this.audioService.playStream(url).subscribe(({ timeStamp, type }) => {
-      // listening for fun here
-      console.log('Event from State: ', { type, timeStamp });
+    this.audioService.playStream(url).subscribe(({ type }) => {
+      if (type === 'ended' && this.repeatCurrentSong === true) {
+        const { index, file } = this.currentFile;
+        this.openFile(file, index);
+      }
 
-      if (type === 'ended') {
+      if (type === 'ended' && this.repeatCurrentSong === false) {
         this.next();
       }
     });
@@ -82,5 +85,9 @@ export class PlayerComponent implements OnInit {
 
   onSliderChangeEnd(change) {
     this.audioService.seekTo(change.value);
+  }
+
+  repeatSong() {
+    this.repeatCurrentSong = !this.repeatCurrentSong;
   }
 }

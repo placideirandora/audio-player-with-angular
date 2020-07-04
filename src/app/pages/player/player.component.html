@@ -59,6 +59,13 @@
         <button mat-button [disabled]="isLastPlaying()" (click)="next()">
           <mat-icon mat-list-icon>skip_next</mat-icon>
         </button>
+        <button mat-button [disabled]="state?.error" (click)="repeatSong()">
+          <mat-icon
+            [ngClass]="repeatCurrentSong ? 'repeat-song' : 'loop-icon'"
+            mat-list-icon
+            >loop</mat-icon
+          >
+        </button>
       </mat-toolbar-row>
     </mat-toolbar>
   </div>
