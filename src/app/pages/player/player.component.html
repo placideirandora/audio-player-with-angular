@@ -29,6 +29,11 @@
   </div>
   <div class="media-footer">
     <mat-toolbar color="primary">
+      <mat-toolbar-row *ngIf="currentSongLoaded" class="song-name-container">
+        <p class="song-name">
+          {{ currentFile.file.name }} - {{ currentFile.file.artist }}
+        </p>
+      </mat-toolbar-row>
       <mat-toolbar-row>
         {{ state?.readableCurrentTime }}
         <mat-slider
@@ -63,23 +68,61 @@
         <button mat-button (click)="stopSong()">
           <mat-icon mat-list-icon>stop</mat-icon>
         </button>
-        <button mat-button [disabled]="state?.error" (click)="repeatSong()">
-          <mat-icon
-            [ngClass]="repeatCurrentSong ? 'repeat-song' : null"
-            mat-list-icon
-            >loop</mat-icon
-          >
+        <button
+          *ngIf="repeatCurrentSong"
+          mat-button
+          matTooltip="Disable Replay Song"
+          matTooltipPosition="above"
+          [disabled]="state?.error"
+          (click)="repeatSong()"
+        >
+          <mat-icon class="replay" mat-list-icon>loop</mat-icon>
+        </button>
+        <button
+          *ngIf="!repeatCurrentSong"
+          mat-button
+          matTooltip="Replay Song"
+          matTooltipPosition="above"
+          [disabled]="state?.error"
+          (click)="repeatSong()"
+        >
+          <mat-icon mat-list-icon>loop</mat-icon>
         </button>
         <button mat-button (click)="onToggleMute()">
-          <mat-icon *ngIf="volumeOn" mat-list-icon>volume_up</mat-icon>
-          <mat-icon *ngIf="!volumeOn" mat-list-icon>volume_off</mat-icon>
-        </button>
-        <button mat-button [disabled]="state?.error" (click)="repeatPlaylist()">
           <mat-icon
-            [ngClass]="repeatCurrentPlaylist ? 'repeat-song' : null"
+            *ngIf="volumeOn"
+            matTooltip="Mute"
+            matTooltipPosition="above"
             mat-list-icon
-            >queue_music</mat-icon
+            >volume_up</mat-icon
           >
+          <mat-icon
+            *ngIf="!volumeOn"
+            matTooltip="Unmute"
+            matTooltipPosition="above"
+            mat-list-icon
+            >volume_off</mat-icon
+          >
+        </button>
+        <button
+          *ngIf="repeatCurrentPlaylist"
+          mat-button
+          matTooltip="Disable Replay Playlist"
+          matTooltipPosition="above"
+          [disabled]="state?.error"
+          (click)="repeatPlaylist()"
+        >
+          <mat-icon class="replay" mat-list-icon>queue_music</mat-icon>
+        </button>
+        <button
+          *ngIf="!repeatCurrentPlaylist"
+          mat-button
+          matTooltip="Replay Playlist"
+          matTooltipPosition="above"
+          [disabled]="state?.error"
+          (click)="repeatPlaylist()"
+        >
+          <mat-icon mat-list-icon>queue_music</mat-icon>
         </button>
       </mat-toolbar-row>
     </mat-toolbar>

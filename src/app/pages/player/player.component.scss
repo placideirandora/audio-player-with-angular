@@ -33,6 +33,13 @@
     position: absolute;
     bottom: 0;
     width: 100%;
+
+    .song-name-container {
+      color: #fff !important;
+      justify-content: center;
+      padding-top: 2.5rem;
+    }
+
     .time-slider {
       width: 100% !important;
       margin-left: 20px;
@@ -48,7 +55,7 @@
         font-size: 44px !important;
       }
 
-      .repeat-song {
+      .replay {
         color: orange;
       }
     }

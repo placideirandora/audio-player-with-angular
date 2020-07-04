@@ -16,6 +16,7 @@ export class PlayerComponent implements OnInit {
   repeatCurrentSong = false;
   repeatCurrentPlaylist = false;
   volumeOn = true;
+  currentSongLoaded = false;
 
   constructor(
     private audioService: AudioService,
@@ -65,6 +66,7 @@ export class PlayerComponent implements OnInit {
 
   openFile(file, index) {
     this.currentFile = { index, file };
+    this.currentSongLoaded = true;
     this.audioService.stop();
     this.playStream(file.url);
   }
