@@ -14,6 +14,7 @@ export class PlayerComponent implements OnInit {
   state: StreamState;
   currentFile: any = {};
   repeatCurrentSong = false;
+  volumeOn = true;
 
   constructor(
     private audioService: AudioService,
@@ -93,5 +94,15 @@ export class PlayerComponent implements OnInit {
 
   repeatSong() {
     this.repeatCurrentSong = !this.repeatCurrentSong;
+  }
+
+  onToggleMute() {
+    this.volumeOn = !this.volumeOn;
+
+    if (!this.volumeOn) {
+      this.audioService.mute();
+    } else {
+      this.audioService.unMute();
+    }
   }
 }

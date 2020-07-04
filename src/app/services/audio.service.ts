@@ -138,6 +138,14 @@ export class AudioService {
     this.audioObj.currentTime = 0;
   }
 
+  mute() {
+    this.audioObj.muted = true;
+  }
+
+  unMute() {
+    this.audioObj.muted = false;
+  }
+
   seekTo(seconds) {
     this.audioObj.currentTime = seconds;
   }

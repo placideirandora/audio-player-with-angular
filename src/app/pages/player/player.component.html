@@ -65,10 +65,14 @@
         </button>
         <button mat-button [disabled]="state?.error" (click)="repeatSong()">
           <mat-icon
-            [ngClass]="repeatCurrentSong ? 'repeat-song' : 'loop-icon'"
+            [ngClass]="repeatCurrentSong ? 'repeat-song' : null"
             mat-list-icon
             >loop</mat-icon
           >
+        </button>
+        <button mat-button (click)="onToggleMute()">
+          <mat-icon *ngIf="volumeOn" mat-list-icon>volume_up</mat-icon>
+          <mat-icon *ngIf="!volumeOn" mat-list-icon>volume_off</mat-icon>
         </button>
       </mat-toolbar-row>
     </mat-toolbar>
