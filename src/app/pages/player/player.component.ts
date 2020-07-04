@@ -47,7 +47,11 @@ export class PlayerComponent implements OnInit {
         this.openFile(file, index);
       }
 
-      if (type === 'ended' && this.repeatCurrentSong === false) {
+      if (
+        type === 'ended' &&
+        this.repeatCurrentSong === false &&
+        !this.isLastPlaying()
+      ) {
         this.next();
       }
     });
@@ -67,8 +71,8 @@ export class PlayerComponent implements OnInit {
     this.audioService.play();
   }
 
-  stop() {
-    this.audioService.stop();
+  stopSong() {
+    this.audioService.stopSong();
   }
 
   next() {

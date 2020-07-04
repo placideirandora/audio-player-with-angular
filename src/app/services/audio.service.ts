@@ -133,6 +133,11 @@ export class AudioService {
     this.stop$.next();
   }
 
+  stopSong() {
+    this.audioObj.pause();
+    this.audioObj.currentTime = 0;
+  }
+
   seekTo(seconds) {
     this.audioObj.currentTime = seconds;
   }

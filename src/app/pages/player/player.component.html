@@ -12,6 +12,7 @@
       <mat-list-item
         *ngFor="let file of files; let i = index"
         (click)="openFile(file, i)"
+        class="song"
       >
         <mat-icon color="primary" mat-list-icon>music_note</mat-icon>
         <h4 mat-line>{{ file.name }}</h4>
@@ -58,6 +59,9 @@
         </button>
         <button mat-button [disabled]="isLastPlaying()" (click)="next()">
           <mat-icon mat-list-icon>skip_next</mat-icon>
+        </button>
+        <button mat-button (click)="stopSong()">
+          <mat-icon mat-list-icon>stop</mat-icon>
         </button>
         <button mat-button [disabled]="state?.error" (click)="repeatSong()">
           <mat-icon
