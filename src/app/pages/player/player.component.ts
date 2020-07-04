@@ -14,6 +14,7 @@ export class PlayerComponent implements OnInit {
   state: StreamState;
   currentFile: any = {};
   repeatCurrentSong = false;
+  repeatCurrentPlaylist = false;
   volumeOn = true;
 
   constructor(
@@ -49,6 +50,15 @@ export class PlayerComponent implements OnInit {
         !this.isLastPlaying()
       ) {
         this.next();
+      }
+
+      if (
+        type === 'ended' &&
+        this.repeatCurrentSong === false &&
+        this.isLastPlaying() &&
+        this.repeatCurrentPlaylist === true
+      ) {
+        this.openFile(this.files[0], 0);
       }
     });
   }
@@ -95,6 +105,10 @@ export class PlayerComponent implements OnInit {
     } else {
       this.audioService.unReplay();
     }
+  }
+
+  repeatPlaylist() {
+    this.repeatCurrentPlaylist = !this.repeatCurrentPlaylist;
   }
 
   onToggleMute() {
