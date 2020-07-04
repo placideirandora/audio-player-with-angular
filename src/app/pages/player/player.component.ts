@@ -24,12 +24,10 @@ export class PlayerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // get media files
     this.cloudService.getFiles().subscribe((files) => {
       this.files = files;
     });
 
-    // listen to stream state
     this.audioService.getState().subscribe((state) => {
       this.state = state;
     });
