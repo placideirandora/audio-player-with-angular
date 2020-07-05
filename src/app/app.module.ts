@@ -8,11 +8,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PlayerComponent } from './pages/player/player.component';
-import { StoreModule } from '@ngrx/store';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent, PlayerComponent],
@@ -28,6 +30,10 @@ import { StoreModule } from '@ngrx/store';
     MatCardModule,
     MatTooltipModule,
     StoreModule.forRoot({}, {}),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: environment.production,
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],
