@@ -1,29 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 import * as moment from 'moment';
-import { StreamState } from '../interfaces/stream-state';
+
+import { ApplicationState } from '../data/Models/ApplicationState';
+import {
+  ADD_SONG_DURATION,
+  ADD_SONG_READABLE_DURATION,
+  ADD_SONG_CAN_PLAY,
+  ADD_SONG_PLAYING,
+  ADD_SONG_PAUSE,
+  ADD_SONG_CURRENT_TIME,
+  ADD_SONG_READABLE_CURRENT_TIME,
+  RESET_AUDIO_STREAM_STATE,
+  ADD_STREAM_ERROR,
+  ADD_CURRENT_SONG,
+  ADD_CURRENT_PLAYLIST,
+} from '../data/ngrx/player.actions';
+import { Song } from '../data/Models/Song';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService {
-  private state: StreamState = {
-    playing: false,
-    readableCurrentTime: '',
-    readableDuration: '',
-    duration: undefined,
-    currentTime: undefined,
-    canplay: false,
-    error: false,
-  };
-
-  private stateChange: BehaviorSubject<StreamState> = new BehaviorSubject(
-    this.state
-  );
+  constructor(private store: Store<ApplicationState>) {}
 
   private stop$ = new Subject();
   private audioObj = new Audio();
+
   audioEvents = [
     'ended',
     'error',
@@ -39,40 +44,37 @@ export class AudioService {
   private updateStateEvents(event: Event): void {
     switch (event.type) {
       case 'canplay':
-        this.state.duration = this.audioObj.duration;
-        this.state.readableDuration = this.formatTime(this.state.duration);
-        this.state.canplay = true;
+        this.store.dispatch(
+          ADD_SONG_DURATION({ duration: this.audioObj.duration })
+        );
+        this.store.dispatch(
+          ADD_SONG_READABLE_DURATION({
+            readableDuration: this.formatTime(this.audioObj.duration),
+          })
+        );
+        this.store.dispatch(ADD_SONG_CAN_PLAY());
         break;
       case 'playing':
-        this.state.playing = true;
+        this.store.dispatch(ADD_SONG_PLAYING());
         break;
       case 'pause':
-        this.state.playing = false;
+        this.store.dispatch(ADD_SONG_PAUSE());
         break;
       case 'timeupdate':
-        this.state.currentTime = this.audioObj.currentTime;
-        this.state.readableCurrentTime = this.formatTime(
-          this.state.currentTime
+        this.store.dispatch(
+          ADD_SONG_CURRENT_TIME({ currentTime: this.audioObj.currentTime })
+        );
+        this.store.dispatch(
+          ADD_SONG_READABLE_CURRENT_TIME({
+            readableCurrentTime: this.formatTime(this.audioObj.currentTime),
+          })
         );
         break;
       case 'error':
-        this.resetState();
-        this.state.error = true;
+        this.store.dispatch(RESET_AUDIO_STREAM_STATE());
+        this.store.dispatch(ADD_STREAM_ERROR());
         break;
     }
-    this.stateChange.next(this.state);
-  }
-
-  private resetState() {
-    this.state = {
-      playing: false,
-      readableCurrentTime: '',
-      readableDuration: '',
-      duration: undefined,
-      currentTime: undefined,
-      canplay: false,
-      error: false,
-    };
   }
 
   private streamObservable(url) {
@@ -95,7 +97,7 @@ export class AudioService {
         // remove event listeners
         this.removeEvents(this.audioObj, this.audioEvents, handler);
         // reset state
-        this.resetState();
+        this.store.dispatch(RESET_AUDIO_STREAM_STATE());
       };
     });
   }
@@ -112,12 +114,12 @@ export class AudioService {
     });
   }
 
-  getState(): Observable<StreamState> {
-    return this.stateChange.asObservable();
-  }
-
-  playStream(url) {
-    return this.streamObservable(url).pipe(takeUntil(this.stop$));
+  playStream(currentSong, currentPlaylist: Song[]) {
+    this.store.dispatch(ADD_CURRENT_SONG({ song: currentSong }));
+    this.store.dispatch(ADD_CURRENT_PLAYLIST({ playlist: currentPlaylist }));
+    return this.streamObservable(currentSong.song.url).pipe(
+      takeUntil(this.stop$)
+    );
   }
 
   play() {

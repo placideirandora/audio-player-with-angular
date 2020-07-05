@@ -15,6 +15,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PlayerComponent } from './pages/player/player.component';
 import { environment } from '../environments/environment';
+import { playerReducer } from './data/ngrx/player.reducer';
 
 @NgModule({
   declarations: [AppComponent, PlayerComponent],
@@ -29,7 +30,7 @@ import { environment } from '../environments/environment';
     MatToolbarModule,
     MatCardModule,
     MatTooltipModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot({ playerState: playerReducer }),
     StoreDevtoolsModule.instrument({
       maxAge: 25,
       logOnly: environment.production,
