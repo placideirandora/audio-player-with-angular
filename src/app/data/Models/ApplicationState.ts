@@ -1,5 +1,5 @@
-import { Song } from './Song';
 import { CurrentSong } from './CurrentSong';
+import { CurrentPlaylist } from './CurrentPlaylist';
 
 export interface ApplicationState {
   playerState: {
@@ -11,6 +11,6 @@ export interface ApplicationState {
     canPlay: boolean;
     error: boolean;
     currentSong: CurrentSong;
-    currentPlaylist: Song[];
+    currentPlaylist: CurrentPlaylist;
   };
 }

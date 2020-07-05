@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 
 import { Song } from '../Models/Song';
+import { CurrentPlaylist } from '../Models/CurrentPlaylist';
 
 export const ADD_STREAM_ERROR = createAction(
   '[Player Component] ADD STREAM ERROR'
@@ -47,5 +48,5 @@ export const ADD_CURRENT_SONG = createAction(
 
 export const ADD_CURRENT_PLAYLIST = createAction(
   '[Player Component] ADD CURRENT PLAYLIST',
-  props<{ playlist: Song[] }>()
+  props<{ playlist: CurrentPlaylist[] }>()
 );

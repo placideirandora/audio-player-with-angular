@@ -27,7 +27,10 @@ const initialPlayerState: ApplicationState['playerState'] = {
     index: undefined,
     song: undefined,
   },
-  currentPlaylist: [],
+  currentPlaylist: {
+    playlist: undefined,
+    songs: undefined,
+  },
 };
 
 export const playerReducer = createReducer(
