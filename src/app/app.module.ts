@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
@@ -30,6 +31,7 @@ import { playerReducer } from './data/ngrx/player.reducer';
     MatToolbarModule,
     MatCardModule,
     MatTooltipModule,
+    MatTabsModule,
     StoreModule.forRoot({ playerState: playerReducer }),
     StoreDevtoolsModule.instrument({
       maxAge: 25,

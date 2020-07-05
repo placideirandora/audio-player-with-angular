@@ -6,6 +6,7 @@ import { CloudService } from '../../services/cloud.service';
 import { ApplicationState } from 'src/app/data/Models/ApplicationState';
 import { Song } from 'src/app/data/Models/Song';
 import { CurrentSong } from 'src/app/data/Models/CurrentSong';
+import { CurrentPlaylist } from 'src/app/data/Models/CurrentPlaylist';
 
 @Component({
   selector: 'app-player',
@@ -13,7 +14,10 @@ import { CurrentSong } from 'src/app/data/Models/CurrentSong';
   styleUrls: ['./player.component.scss'],
 })
 export class PlayerComponent implements OnInit {
-  currentPlaylist: Song[];
+  currentPlaylist: CurrentPlaylist;
+  firstPlaylist: Song[];
+  secondPlaylist: Song[];
+  thirdPlaylist: Song[];
   currentSong: CurrentSong;
   replayCurrentSong = false;
   replayCurrentPlaylist = false;
@@ -28,9 +32,17 @@ export class PlayerComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cloudService.getPlaylist().subscribe((currentPlaylist) => {
-      this.currentPlaylist = currentPlaylist;
-    });
+    this.cloudService
+      .getPlaylists()
+      .subscribe(({ playlistOne, playlistTwo, playlistThree }) => {
+        this.currentPlaylist = {
+          playlist: 1,
+          songs: playlistOne,
+        };
+        this.firstPlaylist = playlistOne;
+        this.secondPlaylist = playlistTwo;
+        this.thirdPlaylist = playlistThree;
+      });
 
     this.store.pipe(select('playerState')).subscribe((state) => {
       this.state = state;
@@ -43,7 +55,7 @@ export class PlayerComponent implements OnInit {
   }
 
   isLastPlaying() {
-    return this.currentSong.index === this.currentPlaylist.length - 1;
+    return this.currentSong.index === this.currentPlaylist.songs.length - 1;
   }
 
   playStream(song, playlist) {
@@ -62,15 +74,43 @@ export class PlayerComponent implements OnInit {
         this.isLastPlaying() &&
         this.replayCurrentPlaylist === true
       ) {
-        this.openSong(this.currentPlaylist[0], 0);
+        this.openSong(this.currentPlaylist.songs[0], 0);
       }
     });
   }
 
   openSong(song: Song, index: number) {
-    this.currentSongLoaded = true;
-    this.audioService.stop();
+    this.audioService.stopStream();
+
+    switch (song.playlist) {
+      case 1:
+        this.currentPlaylist = {
+          playlist: 1,
+          songs: this.firstPlaylist,
+        };
+        break;
+      case 2:
+        this.currentPlaylist = {
+          playlist: 2,
+          songs: this.secondPlaylist,
+        };
+        break;
+      case 3:
+        this.currentPlaylist = {
+          playlist: 3,
+          songs: this.thirdPlaylist,
+        };
+        break;
+      default:
+        this.currentPlaylist = {
+          playlist: 1,
+          songs: this.firstPlaylist,
+        };
+        break;
+    }
+
     this.playStream({ song, index }, this.currentPlaylist);
+    this.currentSongLoaded = true;
   }
 
   pause() {
@@ -87,13 +127,13 @@ export class PlayerComponent implements OnInit {
 
   next() {
     const index = this.currentSong.index + 1;
-    const song = this.currentPlaylist[index];
+    const song = this.currentPlaylist.songs[index];
     this.openSong(song, index);
   }
 
   previous() {
     const index = this.currentSong.index - 1;
-    const song = this.currentPlaylist[index];
+    const song = this.currentPlaylist.songs[index];
     this.openSong(song, index);
   }
 
