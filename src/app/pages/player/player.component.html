@@ -7,31 +7,89 @@
       <mat-icon>music_note</mat-icon>
       <div>Audio Player</div>
     </div>
-    <mat-list color="primary">
-      <h3 mat-subheader>Songs</h3>
-      <mat-list-item
-        *ngFor="let file of files; let i = index"
-        (click)="openFile(file, i)"
-        class="song"
-      >
-        <mat-icon color="primary" mat-list-icon>music_note</mat-icon>
-        <h4 mat-line>{{ file.name }}</h4>
-        <h5 mat-line>by {{ file.artist }}</h5>
-        <mat-icon
-          color="primary"
-          *ngIf="currentFile.index === i && !state?.error"
-          >volume_up</mat-icon
-        >
-        <h6 *ngIf="currentFile.index === i && state?.error">ERROR</h6>
-        <mat-divider class="divider"></mat-divider>
-      </mat-list-item>
-    </mat-list>
+    <mat-tab-group mat-align-tabs="center" animationDuration="0ms">
+      <mat-tab label="Playlist 1">
+        <mat-list color="primary">
+          <h3 mat-subheader>Songs</h3>
+          <mat-list-item
+            *ngFor="let song of firstPlaylist; let i = index"
+            (click)="openSong(song, i)"
+            class="song"
+          >
+            <mat-icon color="primary" mat-list-icon>music_note</mat-icon>
+            <h4 mat-line>{{ song.title }}</h4>
+            <h5 mat-line>by {{ song.artist }}</h5>
+            <mat-icon
+              color="primary"
+              *ngIf="
+                currentSong.index === i &&
+                currentSong.song.playlist === song.playlist &&
+                !state?.error
+              "
+              >volume_up</mat-icon
+            >
+            <h6 *ngIf="currentSong.index === i && state?.error">ERROR</h6>
+            <mat-divider class="divider"></mat-divider>
+          </mat-list-item>
+        </mat-list>
+      </mat-tab>
+      <mat-tab label="Playlist 2">
+        <mat-list color="primary">
+          <h3 mat-subheader>Songs</h3>
+          <mat-list-item
+            *ngFor="let song of secondPlaylist; let i = index"
+            (click)="openSong(song, i)"
+            class="song"
+          >
+            <mat-icon color="primary" mat-list-icon>music_note</mat-icon>
+            <h4 mat-line>{{ song.title }}</h4>
+            <h5 mat-line>by {{ song.artist }}</h5>
+            <mat-icon
+              color="primary"
+              *ngIf="
+                currentSong.index === i &&
+                currentSong.song.playlist === song.playlist &&
+                !state?.error
+              "
+              >volume_up</mat-icon
+            >
+            <h6 *ngIf="currentSong.index === i && state?.error">ERROR</h6>
+            <mat-divider class="divider"></mat-divider>
+          </mat-list-item>
+        </mat-list>
+      </mat-tab>
+      <mat-tab label="Playlist 3">
+        <mat-list color="primary">
+          <h3 mat-subheader>Songs</h3>
+          <mat-list-item
+            *ngFor="let song of thirdPlaylist; let i = index"
+            (click)="openSong(song, i)"
+            class="song"
+          >
+            <mat-icon color="primary" mat-list-icon>music_note</mat-icon>
+            <h4 mat-line>{{ song.title }}</h4>
+            <h5 mat-line>by {{ song.artist }}</h5>
+            <mat-icon
+              color="primary"
+              *ngIf="
+                currentSong.index === i &&
+                currentSong.song.playlist === song.playlist &&
+                !state?.error
+              "
+              >volume_up</mat-icon
+            >
+            <h6 *ngIf="currentSong.index === i && state?.error">ERROR</h6>
+            <mat-divider class="divider"></mat-divider>
+          </mat-list-item>
+        </mat-list>
+      </mat-tab>
+    </mat-tab-group>
   </div>
   <div class="media-footer">
     <mat-toolbar color="primary">
       <mat-toolbar-row *ngIf="currentSongLoaded" class="song-name-container">
         <p class="song-name">
-          {{ currentFile.file.name }} - {{ currentFile.file.artist }}
+          {{ currentSong.song?.title }} - {{ currentSong.song?.artist }}
         </p>
       </mat-toolbar-row>
       <mat-toolbar-row>
@@ -43,56 +101,93 @@
           step="1"
           [value]="state?.currentTime"
           (input)="onSliderChangeEnd($event)"
-          [disabled]="state?.error || currentFile.index === undefined"
+          [disabled]="state?.error || !currentSongLoaded"
         ></mat-slider>
         {{ state?.readableDuration }}
       </mat-toolbar-row>
       <mat-toolbar-row class="media-action-bar">
-        <button mat-button [disabled]="isFirstPlaying()" (click)="previous()">
+        <button
+          mat-button
+          matTooltip="Prev"
+          matTooltipPosition="above"
+          [matTooltipDisabled]="!currentSongLoaded"
+          [disabled]="isFirstPlaying() || !currentSongLoaded"
+          (click)="previous()"
+        >
           <mat-icon mat-list-icon>skip_previous</mat-icon>
         </button>
         <button
           mat-button
+          matTooltip="Play"
+          matTooltipPosition="above"
+          [matTooltipDisabled]="!currentSongLoaded"
           (click)="play()"
-          [disabled]="state?.error"
+          [disabled]="state?.error || !currentSongLoaded"
           *ngIf="!state?.playing"
         >
           <mat-icon mat-list-icon>play_circle_filled</mat-icon>
         </button>
-        <button mat-button (click)="pause()" *ngIf="state?.playing">
+        <button
+          mat-button
+          matTooltip="Pause"
+          matTooltipPosition="above"
+          [matTooltipDisabled]="!currentSongLoaded"
+          [disabled]="!currentSongLoaded"
+          (click)="pause()"
+          *ngIf="state?.playing"
+        >
           <mat-icon mat-list-icon>pause</mat-icon>
         </button>
-        <button mat-button [disabled]="isLastPlaying()" (click)="next()">
+        <button
+          mat-button
+          matTooltip="Next"
+          matTooltipPosition="above"
+          [matTooltipDisabled]="!currentSongLoaded"
+          [disabled]="isLastPlaying() || !currentSongLoaded"
+          (click)="next()"
+        >
           <mat-icon mat-list-icon>skip_next</mat-icon>
         </button>
-        <button mat-button (click)="stopSong()">
+        <button
+          mat-button
+          matTooltip="Stop"
+          matTooltipPosition="above"
+          [matTooltipDisabled]="!currentSongLoaded"
+          [disabled]="!currentSongLoaded"
+          (click)="stopSong()"
+        >
           <mat-icon mat-list-icon>stop</mat-icon>
         </button>
         <button
-          *ngIf="repeatCurrentSong"
+          *ngIf="replayCurrentSong"
           mat-button
           matTooltip="Disable Replay Song"
           matTooltipPosition="above"
-          [disabled]="state?.error"
-          (click)="repeatSong()"
+          [disabled]="state?.error || !currentSongLoaded"
+          (click)="replaySong()"
         >
           <mat-icon class="replay" mat-list-icon>loop</mat-icon>
         </button>
         <button
-          *ngIf="!repeatCurrentSong"
+          *ngIf="!replayCurrentSong"
           mat-button
           matTooltip="Replay Song"
           matTooltipPosition="above"
-          [disabled]="state?.error"
-          (click)="repeatSong()"
+          [disabled]="state?.error || !currentSongLoaded"
+          (click)="replaySong()"
         >
           <mat-icon mat-list-icon>loop</mat-icon>
         </button>
-        <button mat-button (click)="onToggleMute()">
+        <button
+          mat-button
+          [disabled]="!currentSongLoaded"
+          (click)="onToggleMute()"
+        >
           <mat-icon
             *ngIf="volumeOn"
             matTooltip="Mute"
             matTooltipPosition="above"
+            [matTooltipDisabled]="!currentSongLoaded"
             mat-list-icon
             >volume_up</mat-icon
           >
@@ -100,27 +195,28 @@
             *ngIf="!volumeOn"
             matTooltip="Unmute"
             matTooltipPosition="above"
+            [matTooltipDisabled]="!currentSongLoaded"
             mat-list-icon
             >volume_off</mat-icon
           >
         </button>
         <button
-          *ngIf="repeatCurrentPlaylist"
+          *ngIf="replayCurrentPlaylist"
           mat-button
           matTooltip="Disable Replay Playlist"
           matTooltipPosition="above"
-          [disabled]="state?.error"
-          (click)="repeatPlaylist()"
+          [disabled]="state?.error || !currentSongLoaded"
+          (click)="replayPlaylist()"
         >
           <mat-icon class="replay" mat-list-icon>queue_music</mat-icon>
         </button>
         <button
-          *ngIf="!repeatCurrentPlaylist"
+          *ngIf="!replayCurrentPlaylist"
           mat-button
           matTooltip="Replay Playlist"
           matTooltipPosition="above"
-          [disabled]="state?.error"
-          (click)="repeatPlaylist()"
+          [disabled]="state?.error || !currentSongLoaded"
+          (click)="replayPlaylist()"
         >
           <mat-icon mat-list-icon>queue_music</mat-icon>
         </button>

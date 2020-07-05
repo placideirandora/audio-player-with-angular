@@ -68,3 +68,13 @@
     }
   }
 }
+
+::ng-deep .mat-tab-label,
+.mat-tab-link {
+  color: #000 !important;
+}
+
+::ng-deep .mat-tab-group {
+  max-height: 45vh !important;
+  height: 45vh !important;
+}

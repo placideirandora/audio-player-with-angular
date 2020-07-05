@@ -1,29 +1,34 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 import * as moment from 'moment';
-import { StreamState } from '../interfaces/stream-state';
+
+import { ApplicationState } from '../data/Models/ApplicationState';
+import { CurrentPlaylist } from '../data/Models/CurrentPlaylist';
+import {
+  ADD_SONG_DURATION,
+  ADD_SONG_READABLE_DURATION,
+  ADD_SONG_CAN_PLAY,
+  ADD_SONG_PLAYING,
+  ADD_SONG_PAUSE,
+  ADD_SONG_CURRENT_TIME,
+  ADD_SONG_READABLE_CURRENT_TIME,
+  RESET_AUDIO_STREAM_STATE,
+  ADD_STREAM_ERROR,
+  ADD_CURRENT_SONG,
+  ADD_CURRENT_PLAYLIST,
+} from '../data/ngrx/player.actions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService {
-  private state: StreamState = {
-    playing: false,
-    readableCurrentTime: '',
-    readableDuration: '',
-    duration: undefined,
-    currentTime: undefined,
-    canplay: false,
-    error: false,
-  };
-
-  private stateChange: BehaviorSubject<StreamState> = new BehaviorSubject(
-    this.state
-  );
+  constructor(private store: Store<ApplicationState>) {}
 
   private stop$ = new Subject();
   private audioObj = new Audio();
+
   audioEvents = [
     'ended',
     'error',
@@ -39,45 +44,41 @@ export class AudioService {
   private updateStateEvents(event: Event): void {
     switch (event.type) {
       case 'canplay':
-        this.state.duration = this.audioObj.duration;
-        this.state.readableDuration = this.formatTime(this.state.duration);
-        this.state.canplay = true;
+        this.store.dispatch(
+          ADD_SONG_DURATION({ duration: this.audioObj.duration })
+        );
+        this.store.dispatch(
+          ADD_SONG_READABLE_DURATION({
+            readableDuration: this.formatTime(this.audioObj.duration),
+          })
+        );
+        this.store.dispatch(ADD_SONG_CAN_PLAY());
         break;
       case 'playing':
-        this.state.playing = true;
+        this.store.dispatch(ADD_SONG_PLAYING());
         break;
       case 'pause':
-        this.state.playing = false;
+        this.store.dispatch(ADD_SONG_PAUSE());
         break;
       case 'timeupdate':
-        this.state.currentTime = this.audioObj.currentTime;
-        this.state.readableCurrentTime = this.formatTime(
-          this.state.currentTime
+        this.store.dispatch(
+          ADD_SONG_CURRENT_TIME({ currentTime: this.audioObj.currentTime })
+        );
+        this.store.dispatch(
+          ADD_SONG_READABLE_CURRENT_TIME({
+            readableCurrentTime: this.formatTime(this.audioObj.currentTime),
+          })
         );
         break;
       case 'error':
-        this.resetState();
-        this.state.error = true;
+        this.store.dispatch(RESET_AUDIO_STREAM_STATE());
+        this.store.dispatch(ADD_STREAM_ERROR());
         break;
     }
-    this.stateChange.next(this.state);
-  }
-
-  private resetState() {
-    this.state = {
-      playing: false,
-      readableCurrentTime: '',
-      readableDuration: '',
-      duration: undefined,
-      currentTime: undefined,
-      canplay: false,
-      error: false,
-    };
   }
 
   private streamObservable(url) {
     return new Observable((observer) => {
-      // Play audio
       this.audioObj.src = url;
       this.audioObj.load();
       this.audioObj.play();
@@ -88,15 +89,6 @@ export class AudioService {
       };
 
       this.addEvents(this.audioObj, this.audioEvents, handler);
-      return () => {
-        // Stop Playing
-        this.audioObj.pause();
-        this.audioObj.currentTime = 0;
-        // remove event listeners
-        this.removeEvents(this.audioObj, this.audioEvents, handler);
-        // reset state
-        this.resetState();
-      };
     });
   }
 
@@ -106,58 +98,52 @@ export class AudioService {
     });
   }
 
-  private removeEvents(obj, events, handler) {
-    events.forEach((event) => {
-      obj.removeEventListener(event, handler);
-    });
+  public playStream(currentSong, currentPlaylist: CurrentPlaylist[]) {
+    this.store.dispatch(ADD_CURRENT_SONG({ song: currentSong }));
+    this.store.dispatch(ADD_CURRENT_PLAYLIST({ playlist: currentPlaylist }));
+    return this.streamObservable(currentSong.song.url).pipe(
+      takeUntil(this.stop$)
+    );
   }
 
-  getState(): Observable<StreamState> {
-    return this.stateChange.asObservable();
-  }
-
-  playStream(url) {
-    return this.streamObservable(url).pipe(takeUntil(this.stop$));
-  }
-
-  play() {
+  public play() {
     this.audioObj.play();
   }
 
-  pause() {
+  public pause() {
     this.audioObj.pause();
   }
 
-  stop() {
+  public stopStream() {
     this.stop$.next();
   }
 
-  stopSong() {
+  public stopSong() {
     this.audioObj.pause();
     this.audioObj.currentTime = 0;
   }
 
-  mute() {
+  public mute() {
     this.audioObj.muted = true;
   }
 
-  unMute() {
+  public unMute() {
     this.audioObj.muted = false;
   }
 
-  replay() {
+  public replay() {
     this.audioObj.loop = true;
   }
 
-  unReplay() {
+  public unReplay() {
     this.audioObj.loop = false;
   }
 
-  seekTo(seconds) {
+  public seekTo(seconds) {
     this.audioObj.currentTime = seconds;
   }
 
-  formatTime(time: number, format: string = 'HH:mm:ss') {
+  private formatTime(time: number, format: string = 'HH:mm:ss') {
     const momentTime = time * 1000;
     return moment.utc(momentTime).format(format);
   }

@@ -8,10 +8,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PlayerComponent } from './pages/player/player.component';
+import { environment } from '../environments/environment';
+import { playerReducer } from './data/ngrx/player.reducer';
 
 @NgModule({
   declarations: [AppComponent, PlayerComponent],
@@ -26,6 +31,12 @@ import { PlayerComponent } from './pages/player/player.component';
     MatToolbarModule,
     MatCardModule,
     MatTooltipModule,
+    MatTabsModule,
+    StoreModule.forRoot({ playerState: playerReducer }),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25,
+      logOnly: environment.production,
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],
