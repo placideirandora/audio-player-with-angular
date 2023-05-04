@@ -11,6 +11,7 @@
     "dev:ssr": "ng run audio-player:serve-ssr",
     "serve:ssr": "node dist/audio-player/server/main.js",
     "build:ssr": "ng build --prod && ng run audio-player:server:production",
+    "build:ssr:render": "npx ng build --prod && ng run audio-player:server:production",
     "prerender": "ng run audio-player:prerender"
   },
   "private": true,
