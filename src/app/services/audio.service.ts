@@ -4,6 +4,9 @@ import { takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 
+import { PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+
 import { ApplicationState } from '../data/Models/ApplicationState';
 import { CurrentPlaylist } from '../data/Models/CurrentPlaylist';
 import {
@@ -24,10 +27,19 @@ import {
   providedIn: 'root',
 })
 export class AudioService {
-  constructor(private store: Store<ApplicationState>) {}
+  private stop$: any;
+  private audioObj: any;
+  private isBrowser: boolean;
 
-  private stop$ = new Subject();
-  private audioObj = new Audio();
+  constructor(
+    private store: Store<ApplicationState>,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
+    if (this.isBrowser) this.audioObj = new Audio();
+    this.stop$ = new Subject();
+  }
 
   audioEvents = [
     'ended',

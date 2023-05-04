@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store, select } from '@ngrx/store';
+import { Meta } from '@angular/platform-browser';
 
 import { AudioService } from '../../services/audio.service';
 import { CloudService } from '../../services/cloud.service';
@@ -28,8 +29,11 @@ export class PlayerComponent implements OnInit {
   constructor(
     private audioService: AudioService,
     private cloudService: CloudService,
-    private store: Store<ApplicationState>
-  ) {}
+    private store: Store<ApplicationState>,
+    private meta: Meta,
+  ) {
+    this.meta.addTag({ name: 'description', content: 'A web application for streaming audio' });
+  }
 
   ngOnInit(): void {
     this.cloudService

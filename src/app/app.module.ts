@@ -21,7 +21,7 @@ import { playerReducer } from './data/ngrx/player.reducer';
 @NgModule({
   declarations: [AppComponent, PlayerComponent],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     BrowserAnimationsModule,
     MatButtonModule,
